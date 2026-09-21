@@ -36,6 +36,23 @@ def load_parquet_files():
         """)
         logger.info("Created yellow_trips table, drop if table exists")
 
+        con.execute(f"""
+                    DROP TABLE IF EXISTS green_trips;
+                    CREATE TABLE green_trips AS
+                    SELECT VendorID,
+                    lpep_pickup_datetime,
+                    lpep_dropoff_datetime,
+                    passenger_count,
+                    trip_distance,
+                    fare_amount,
+                    total_amount,
+                    PULocationID,
+                    DOLocationID,
+                    FROM read_parquet(
+                    '{baseurl}green_tripdata_2024-01.parquet');
+                """)
+        logger.info("Created green_trips table, drop if table exists")
+
         con.execute("""
             DROP TABLE IF EXISTS vehicle_emissions;
             CREATE TABLE vehicle_emissions AS
@@ -75,7 +92,35 @@ def load_parquet_files():
                 trip_distance
             FROM yellow_trips;
         """)
-        logger.info("Selected columns")
+        logger.info("Renamed yellow_trips columns")
+
+        for month in range(2,13):
+            url = (f'{baseurl}green_tripdata_2024-{month:02d}.parquet'
+            )
+            con.execute(
+                    f"""INSERT INTO green_trips 
+                    SELECT VendorID,
+                    lpep_pickup_datetime,
+                    lpep_dropoff_datetime,
+                    passenger_count,
+                    trip_distance,
+                    fare_amount,
+                    total_amount,
+                    PULocationID,
+                    DOLocationID 
+                    FROM read_parquet('{url}')"""
+            )
+    
+            con.execute("""
+                SELECT
+                    VendorID,
+                    lpep_pickup_datetime AS pickup_time, -- lpep_pickup_datetime on GREEN
+                    lpep_dropoff_datetime AS dropoff_time, -- lpep_dropoff_datetime on GREEN
+                    passenger_count,
+                    trip_distance
+                FROM green_trips;
+            """)
+        logger.info("Renamed green_trips columns")
         
     except Exception as e:
         print(f"An error occurred: {e}")
