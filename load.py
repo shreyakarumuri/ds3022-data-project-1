@@ -49,7 +49,7 @@ def load_parquet_files():
         ).fetchone()[0]
         logger.info(f"vehicle_emissions: {n} rows loaded")
 
-        for month in range(2,3):
+        for month in range(2,13):
             url = (f'{baseurl}yellow_tripdata_2024-{month:02d}.parquet'
             )
             con.execute(
@@ -77,7 +77,6 @@ def load_parquet_files():
         """)
         logger.info("Selected columns")
         
-
     except Exception as e:
         print(f"An error occurred: {e}")
         logger.error(f"An error occurred: {e}")
