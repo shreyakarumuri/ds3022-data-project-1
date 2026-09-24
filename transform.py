@@ -7,9 +7,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-con = duckdb.connect(database='emissions.duckdb', read_only=False)
-logger.info("Connected to DuckDB instance")
-
+# Connecting to DuckDB
+try:
+        # Connect to local DuckDB instance
+        con = duckdb.connect(database='emissions.duckdb', read_only=False)
+        logger.info("Connected to DuckDB instance")
+except Exception as e:
+            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred while trying to connect to DuckDB: {e}")
+# Adds new columns and defines their type
 def add_columns(color):
     c = color
     try:
@@ -25,7 +31,8 @@ def add_columns(color):
     except Exception as e:
         print(f"An error occurred while adding columns to {c}_trips: {e}")
         logger.error(f"An error occurred while adding columns to {c}_trips: {e}")
-        
+
+# Calculates the co2 emissions for taxi trips and adds that as a column to the dataset      
 def trip_co2_kgs(color):
     c = color
     try:
@@ -40,7 +47,7 @@ def trip_co2_kgs(color):
     except Exception as e:
             print(f"An error occurred while adding trip_co2_kgs to {c}_trips: {e}")
             logger.error(f"An error occurred while adding trip_co2_kgs to {c}_trips: {e}")
-
+# Calculates the averag emiles per hour of taxi trips and adds that as a column to the dataset      
 def avg_mph(color):
     c = color
     try:
@@ -53,7 +60,7 @@ def avg_mph(color):
         print(f"An error occurred while adding avg_mph to {c}_trips: {e}")
         logger.error(f"An error occurred while adding avg_mph to {c}_trips: {e}")
     
-
+# Adds columns for the hour of the day, day of the week, week of the year and month of the year
 def time_breakdown(color):
     c = color
     try:
@@ -64,10 +71,12 @@ def time_breakdown(color):
                 week_of_year = date_part('week', pickup_time),
                 month_of_year = date_part('month', pickup_time)
         """)
+        logger.info(f"Added time breakdown columns to {c}_trips")
     except Exception as e:
         print(f"An error occurred while adding time breakdown columns to {c}_trips: {e}")
         logger.error(f"An error occurred while adding time breakdown columns to {c}_trips: {e}")
 
+# Adds the empty columsn and specific caluclations for both yellow and green trips
 if __name__ == "__main__":
     add_columns("yellow")
     add_columns("green")

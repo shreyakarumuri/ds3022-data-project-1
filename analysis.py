@@ -21,10 +21,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Establishes DuckDB connection
-con = duckdb.connect(database='emissions.duckdb', read_only=False)
-logger.info("Connected to DuckDB instance")
-
+# Connecting to DuckDB
+try:
+        # Connect to local DuckDB instance
+        con = duckdb.connect(database='emissions.duckdb', read_only=False)
+        logger.info("Connected to DuckDB instance")
+except Exception as e:
+            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred while trying to connect to DuckDB: {e}")
+            
 
 # Prints and logs a message so you no longer need to type out both print() and logger.info()
 def report(message):

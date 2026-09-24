@@ -148,7 +148,8 @@ def load_parquet_files():
                 print(f"An error occurred: {e}")
                 logger.error(f"An error occurred while trying to print green_trips row count: {e}")
 
-
+    con.close()
+    logger.info("Closed DuckDB connection")
 
 
 if __name__ == "__main__":
